@@ -16,10 +16,6 @@ import random
 import shutil
 
 
-# Set seed for reproducibility
-random.seed(config["seed"])
-
-
 #### Colors for the print
 # ANSI color escape codes
 RED_START = "\033[91m"
@@ -27,39 +23,17 @@ GREEN_START = "\033[92m"
 BLUE_START = "\033[94m"
 COLOR_END = "\033[0m"  # Reset color to default
 
-
-# Import all rule files from the rules directory
-include: "rules/*.smk"
-
-
-# Import all scripts
-# Define a function to filter script files
-def get_script_files(directory):
-    script_files = []
-    for filename in os.listdir(directory):
-        if filename.endswith((".py", ".R", ".sh", ".pl")):
-            script_files.append(os.path.join(directory, filename))
-    return script_files
-
-# Fetch all script files from the scripts directory
-script_files = get_script_files("scripts/")
-
-# Include all script files in the workflow
-for script in script_files:
-    include: script
-
-
-# config file
 configfile: "config.yaml"
 
-
-# Base url for fetching data
+# set seed for reproducibility
+random.seed(config["seed"])
+# base url for fetching data
 BASE_URL = "https://ftp.ensembl.org/pub"
 
 
-###########################################
-## Parameters from the config and checks ##
-###########################################
+#########################################
+# Parameters from the config and checks #
+#########################################
 
 # resources base path ############
 GENOME_DOWNLOAD_PATH = config["genome"]["local_path"]
