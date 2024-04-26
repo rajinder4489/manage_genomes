@@ -1,6 +1,6 @@
 tasks:
   - name: Docker Compose
-    command: docker-compose -f docker.yml
+    command: docker-compose -f docker.yaml
 
 vscode:
   extensions:
