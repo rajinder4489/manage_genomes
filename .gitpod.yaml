@@ -1,0 +1,9 @@
+tasks:
+  - name: Docker Compose
+    command: docker-compose -f docker.yml
+
+vscode:
+  extensions:
+    - ms-azuretools.vscode-docker
+    - ms-python.python
+    - Snakemake.snakemake-lang
