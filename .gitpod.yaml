@@ -1,3 +1,6 @@
+image: 
+  file: docker.yml
+  
 tasks:
   - name: Docker Compose
     command: docker-compose -f docker.yaml
