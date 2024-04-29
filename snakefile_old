@@ -27,6 +27,8 @@ configfile: "config.yaml"
 
 # set seed for reproducibility
 random.seed(config["seed"])
+
+
 # base url for fetching data
 BASE_URL = "https://ftp.ensembl.org/pub"
 
@@ -39,7 +41,7 @@ BASE_URL = "https://ftp.ensembl.org/pub"
 GENOME_DOWNLOAD_PATH = config["genome"]["local_path"]
 if not exists(GENOME_DOWNLOAD_PATH):
     raise WorkflowError("Could not find the genome download directory '" + GENOME_DOWNLOAD_PATH + "' specified via 'genome:local_path'!")
-GENOME_DOWNLOAD_PATH = "."
+# GENOME_DOWNLOAD_PATH = "."
 GENOME_DOWNLOAD_PATH.rstrip(os.sep)
 GENOME_DOWNLOAD_PATH = abspath(GENOME_DOWNLOAD_PATH)
 
@@ -47,7 +49,7 @@ GENOME_DOWNLOAD_PATH = abspath(GENOME_DOWNLOAD_PATH)
 INDICES_BUILD_PATH = config["indices"]["local_path"]
 if not exists(INDICES_BUILD_PATH):
     raise WorkflowError("Could not find the indices build directory '" + INDICES_BUILD_PATH + "' specified via 'indices:local_path'!")
-INDICES_BUILD_PATH = "."
+# INDICES_BUILD_PATH = "."
 INDICES_BUILD_PATH.rstrip(os.sep)
 INDICES_BUILD_PATH = abspath(INDICES_BUILD_PATH)
 
@@ -55,6 +57,7 @@ INDICES_BUILD_PATH = abspath(INDICES_BUILD_PATH)
 # assembly ############
 ALL_ASSEMBLIES = ['grch37', 'grch38']
 ASSEMBLY = config["genome"]["assembly"] # config.get('assembly', '')
+
 
 if not ASSEMBLY:
     raise WorkflowError("Please provide the assembly via 'assembly' in the config.yaml!")

@@ -8,3 +8,16 @@ The steps performed in this workflow include:
 3. Create indices for bowtie1, bowtie2, bwa, star, cellran ger, cell ranger vdj
 4. Generate various derivatives of gtf: bed, refflat, igv, and gene-transcript relationship file
 
+To do:
+
+1. Handle multiple options for assembly, species, release and type
+2. Split all rules and scripts in individual files
+3. Build indices for xengsort for multiple species together
+4. Get repeats: from ensembl under mysql folder
+5. vep files
+6. Download data from Refseq or other sources
+7. ERCC: may be add this manually, if too much of work
+8. Restructure paths for download and file creation
+
+
+Refer this path for info /dcgc/support/pipeline/fastqc 
