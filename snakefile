@@ -29,7 +29,7 @@ base_url = config[source]["base_url"]
 # print("\n\n" + "Checking " + source + " " + base_url)
 
 # Import all rule files from the rules directory
-#include: "rules/bed.smk"
+include: "rules/download.smk"
 
 
 # Import all scripts
@@ -37,7 +37,7 @@ base_url = config[source]["base_url"]
 def get_script_files(directory):
     script_files = []
     for filename in os.listdir(directory):
-        if filename.endswith((".py", ".R", ".sh", ".pl")):
+        if filename.endswith((".py", ".R", ".pl")):     # ".sh",
             script_files.append(os.path.join(directory, filename))
     return script_files
 
@@ -45,8 +45,8 @@ def get_script_files(directory):
 script_files = get_script_files("scripts/")
 
 # Include all script files in the workflow
-#for script in script_files:
-#    include: script
+for script in script_files:
+    include: script
 
 
 ###########################################
@@ -84,9 +84,23 @@ if(config["build_indices"]["bowtie1"]["run"] or
     indices_build_path = abspath(indices_build_path)
 
 
-include: "scripts/check_exists.py"
+# Check what combinations exist
 if source == "ensembl":
-    working_combinations = combination_checks_ensembl(config)
+    working_dict = combination_checks_ensembl(config)
+elif source == "refseq":
+    working_dict = combination_checks_refseq(config)
 
 
-print(working_combinations)
+# Check what files are availbale for the valid combinations and patterns
+if source == "ensembl":
+    downloadable_files = downloadable_ensembl(config, working_dict)
+elif source == "refseq":
+    downloadable_files = downloadable_refseq(config, working_dict)
+
+
+for key in downloadable_files:
+    print(downloadable_files[key]['assembly'])
+    print(downloadable_files[key]['fasta'])
+    print(downloadable_files[key]['annotation'])
+
+

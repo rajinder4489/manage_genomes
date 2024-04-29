@@ -17,11 +17,12 @@ DARK_RED = "\033[31m"   # Fail message
 DARK_GREEN = "\033[32m" # Success message
 COLOR_END = "\033[0m"   # Reset color to default
 
-colored_failed = f"{DARK_RED}Failed{COLOR_END}"
-colored_success = f"{DARK_RED}Success{COLOR_END}"
+colored_failed = f"{DARK_RED}Failed fetching combination{COLOR_END}"
+colored_success = f"{DARK_RED}Succeded fetching combination{COLOR_END}"
 
 class MissingValueCombination(UserWarning):
     """Class representing a missing combination."""
+
 
 def combination_checks_ensembl(config):
     """Class to check for the available assemblies/releases/species/seq types"""
@@ -64,9 +65,10 @@ def combination_checks_ensembl(config):
                 colored_assembly = f"{GREEN}{assembly}{COLOR_END}"
                 print(colored_assembly)
             #raise ValueError(f"The provided assembly '{a}' is not available in Ensembl")
-            warnings.warn(f"The provided assembly '{a}' is not available in Ensembl")
+            warnings.warn(f"The provided assembly '{a}' is not available in Ensembl", MissingValueCombination)
             continue
 
+        
         if a == 'grch38':
             assembly_path = ''
         elif a == 'grch37':
@@ -90,7 +92,7 @@ def combination_checks_ensembl(config):
                 release = "  ".join(all_releases[i:i+release_per_line])
                 colored_release = f"{BLUE}{release}{COLOR_END}"
                 print(colored_release)
-            warnings.warn(f"The provided release '{r}' is not available for assembly '{a}' in Ensembl.")
+            warnings.warn(f"The provided release '{r}' is not available for assembly '{a}' in Ensembl.", MissingValueCombination)
             continue
 
 
@@ -111,7 +113,7 @@ def combination_checks_ensembl(config):
                 species = "   ".join(all_species[i:i+species_per_line])
                 colored_species = f"{RED}{species}{COLOR_END}"
                 print(colored_species)
-            warnings.warn(f"The provided species '{s}' is not available for assembly '{a}' and release '{r}' in Ensembl.")
+            warnings.warn(f"The provided species '{s}' is not available for assembly '{a}' and release '{r}' in Ensembl.", MissingValueCombination)
             continue
 
 
@@ -132,7 +134,7 @@ def combination_checks_ensembl(config):
                 seqtype = "   ".join(all_seqtype[i:i+seqtype_per_line])
                 colored_seqtype = f"{YELLOW}{seqtype}{COLOR_END}"
                 print(colored_seqtype)
-            warnings.warn(f"The provided type '{t}' is not available for assembly '{a}', release '{r}', and species '{s}' in Ensembl.")
+            warnings.warn(f"The provided type '{t}' is not available for assembly '{a}', release '{r}', and species '{s}' in Ensembl.", MissingValueCombination)
             continue
 
         print(colored_success)

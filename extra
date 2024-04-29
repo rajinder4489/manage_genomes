@@ -1,47 +1,4 @@
 
-# get fasta files ###########
-url = f"{base_url}/{assembly_path}/{release}/fasta/{species}/{seqtype}/"
-with urllib.request.urlopen(url) as response:
-    html_content = response.read()
-
-soup = BeautifulSoup(html_content, "html.parser")
-ALL_FILES = list([link['href'] for link in soup.find_all('a') if link.get('href') and not link['href'].endswith('/')])
-
-# patterns fasta file ########
-fasta_patterns_include = config["genome"]["fasta"]["file_patterns_include"]
-fasta_patterns_exclude = config["genome"]["fasta"]["file_patterns_exclude"]
-
-fasta_to_keep = re.compile('|'.join(fasta_patterns_include))
-fasta_to_remove = re.compile('|'.join(fasta_patterns_exclude))
-
-fasta_download = [s for s in ALL_FILES if re.search(fasta_to_keep, s)]
-fasta_download = [s for s in fasta_download if not re.search(fasta_to_remove, s)]
-only_fasta = [re.sub(r'\.gz$', '', fasta) for fasta in fasta_download if re.search(r'\.fa\.gz$', fasta)]
-
-
-# get anno files ###########
-url = f"{base_url}/{assembly_path}/{release}/gtf/{species}/"
-with urllib.request.urlopen(url) as response:
-    html_content = response.read()
-
-soup = BeautifulSoup(html_content, "html.parser")
-ALL_FILES_ANNO = list([link['href'] for link in soup.find_all('a') if link.get('href') and not link['href'].endswith('/')])
-
-# patterns anno file ########
-anno_patterns_include = config["genome"]["annotation"]["file_patterns_include"]
-anno_patterns_exclude = config["genome"]["annotation"]["file_patterns_exclude"]
-
-anno_to_keep = re.compile('|'.join(anno_patterns_include))
-anno_to_remove = re.compile('|'.join(anno_patterns_exclude))
-
-anno_download = [s for s in ALL_FILES_ANNO if re.search(anno_to_keep, s)]
-anno_download = [s for s in anno_download if not re.search(anno_to_remove, s)]
-anno_extensionless = [os.path.splitext(os.path.splitext(path)[0])[0] for path in anno_download]
-
-
-print("\n\n" + "Running for " + assembly + " " + release + " " + species + " " + seqtype)
-
-
 #################
 #### Tagrets ####
 #################
@@ -202,3 +159,35 @@ rule decompress:
             gzip -df {input}
             """
             )
+
+
+
+
+rule download_genome:
+    output:
+        expand(os.path.join(GENOME_DOWNLOAD_PATH, SPECIES, ASSEMBLY, RELEASE, SEQTYPE, "{file}"), file = fasta_download)
+    run:
+        if config["genome"]["fasta"]["download"]:
+            print("\n\nI will now try to download the fasta file(s) and if already mentioned, CHECKSUMS...\n\n")
+            for file in fasta_download:
+                print(file)
+                url = f"{BASE_URL}/{ASSEMBLYPATH}/{RELEASE}/fasta/{SPECIES}/{SEQTYPE}/{file}"
+                filename = os.path.join(GENOME_DOWNLOAD_PATH, SPECIES, ASSEMBLY, RELEASE, SEQTYPE, file)
+                urllib.request.urlretrieve(url, filename)
+        else:
+            print("Skipping download_genome rule.")
+
+
+rule download_annotation:
+    output:
+        expand(os.path.join(GENOME_DOWNLOAD_PATH, SPECIES, ASSEMBLY, RELEASE, "annotation", "{file}"), file = anno_download)
+
+    run:
+        if config["genome"]["annotation"]["download"]:
+            print("\n\nI will now try to download the annotation file(s) and if already mentioned, CHECKSUMS...\n\n")
+            for file in anno_download:
+                url = f"{BASE_URL}/{ASSEMBLYPATH}/{RELEASE}/gtf/{SPECIES}/{file}"
+                filename = os.path.join(GENOME_DOWNLOAD_PATH, SPECIES, ASSEMBLY, RELEASE, "annotation", file)
+                urllib.request.urlretrieve(url, filename)
+        else:
+            print("Skipping download_annotation rule.")
