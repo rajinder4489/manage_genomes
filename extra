@@ -191,3 +191,38 @@ rule download_annotation:
                 urllib.request.urlretrieve(url, filename)
         else:
             print("Skipping download_annotation rule.")
+
+
+############
+
+
+rule download_genome_ensembl:
+    output:
+        dynamic(os.path.join(genome_download_path, "{species}", "{assembly}", "{release}", "{seqtype}", "{g_file}"))
+
+    wildcard_constraints:
+        g_file = ".*.fa.gz|CHECKSUMS",
+        seq_type = "dna|cdna|cds|ncrna|pep|dna_index"
+    
+    run:
+        if config["ensembl"]["fasta"]["download"]:
+            for key, values in downloadable_files.items():
+                assembly = values["assembly"]
+                release = values["release"]
+                species = values["species"]
+                seqtype = values["seqtype"]
+                genome_files = values["fasta"]
+
+
+                if assembly == 'grch38':
+                    assembly_path = ''
+                elif assembly == 'grch37':
+                    assembly_path = 'grch37'
+
+                for g_file in genome_files:
+                    url = f"{base_url}/{assembly_path}/{release}/fasta/{species}/{seqtype}/{g_file}"
+                    filename = os.path.join(genome_download_path, species, assembly, release, seqtype, g_file)
+                    urllib.request.urlretrieve(url, filename)
+        else:
+            print("Skipping download_genome rule.")
+

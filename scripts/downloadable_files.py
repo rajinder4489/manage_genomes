@@ -11,8 +11,8 @@ DARK_RED = "\033[31m"   # Fail message
 DARK_GREEN = "\033[32m" # Success message
 COLOR_END = "\033[0m"   # Reset color to default
 
-colored_failed = f"{DARK_RED}Failed: No files left after filtering for the regex{COLOR_END}"
-colored_success = f"{DARK_RED}Succeded: Got some files to fetch{COLOR_END}"
+colored_failed_files = f"{DARK_RED}Failed: No files left after filtering for the regex{COLOR_END}"
+colored_success_files = f"{DARK_RED}Succeded: Got some files to fetch{COLOR_END}"
 
 class MissingFiles(UserWarning):
     """Class representing missing file(s)."""
@@ -36,6 +36,8 @@ def downloadable_ensembl(config, combn_dict):
             assembly_path = 'grch37'
     
     
+        print("\n" + "Checking files for " + a + " " + r + " " + s + " " + t)
+
         # get fasta files ###########
         url = f"{base_url}/{assembly_path}/{r}/fasta/{s}/{t}/"
         with urllib.request.urlopen(url) as response:
@@ -55,11 +57,12 @@ def downloadable_ensembl(config, combn_dict):
         fasta_download = [s for s in fasta_download if not re.search(fasta_to_remove, s)]
         # only_fasta = [re.sub(r'\.gz$', '', fasta) for fasta in fasta_download if re.search(r'\.fa\.gz$', fasta)]
 
+        print("Fasta file(s)")
         if not fasta_download:
-            warnings.warn(colored_failed, MissingFiles)
+            warnings.warn(colored_failed_files, MissingFiles)
             combn_dict[key]["fasta"] = ""
         else:
-            print(colored_success)
+            print(colored_success_files)
             combn_dict[key]["fasta"] = fasta_download
 
 
@@ -82,11 +85,12 @@ def downloadable_ensembl(config, combn_dict):
         anno_download = [s for s in anno_download if not re.search(anno_to_remove, s)]
         # anno_extensionless = [os.path.splitext(os.path.splitext(path)[0])[0] for path in anno_download]
 
+        print("Annotation file(s)")
         if not anno_download:
-            warnings.warn(colored_failed, MissingFiles)
+            warnings.warn(colored_failed_files, MissingFiles)
             combn_dict[key]["annotation"] = ""
         else:
-            print(colored_success)
+            print(colored_success_files)
             combn_dict[key]["annotation"] = anno_download
     
     return(combn_dict)

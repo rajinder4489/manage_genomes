@@ -4,10 +4,10 @@
 seed: 123
 
 local:
-        path_genome: "."
+        path_genome:
         # hierarchy of sub folders: 
         path_indices: "."
-        # hierarchy of sub folders: 
+        # hierarchy of sub folders: cds
         path_other_files: "."
         # hierarchy of sub folders: 
 
@@ -18,7 +18,7 @@ source: ensembl
 
 ensembl:
         base_url: https://ftp.ensembl.org/pub
-        assembly: [grch38, test]
+        assembly: [grch38]
         release: [release-111]
         species: [ciona_intestinalis, acanthochromis_polyacanthus] #acanthochromis_polyacanthus
         seq_type: [dna, cdna]
@@ -26,29 +26,30 @@ ensembl:
                 download: true
                 local_path: 
                 # Define if other than path_genome. Sub folders will be created; refer local
-                file_patterns_include: [CHECKSUMS, sm]
+                file_patterns_include: [sm, CHECKSUMS]
                 file_patterns_exclude: [rm, primary, nonchromosomal, chromosome]
         annotation: 
                 download: true
                 local_path: 
                 # Define if other than path_genome. Sub folders will be created; refer local
                 file_patterns_include: [gtf]
-                file_patterns_exclude: [abinitio, chr, chromosome]
+                file_patterns_exclude: [abinitio, chr, chromosome, CHECKSUMS]
         ensembl_repeats: 
                 download: true
                 local_path: 
-                # Define if other than path_genome. Sub folders will be created; refer local
+                # Define if other than path_other_files. Sub folders will be created; refer local
+
 
 refseq: 
-        base_url: 
-        taxonomy:
-        species:
-        release:
+        base_url: https://ftp.ncbi.nlm.nih.gov/genomes/refseq/
+        taxonomy: [invertebrate]
+        species: [Ciona_intestinalis]
+        release: []
 
 
 other_files:
         vep: 
-                run: true
+                download: true
                 base_url: ftp path
                 local_path: 
                 # Define if other than path_other_files. Sub folders will be created; refer local
