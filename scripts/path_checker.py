@@ -1,3 +1,8 @@
+"""
+Module for checking if the paths are given and they exist
+Else set to current directory
+"""
+
 import os
 import warnings
 import sys

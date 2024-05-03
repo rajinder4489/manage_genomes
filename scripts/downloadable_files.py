@@ -1,4 +1,7 @@
-import os
+"""
+Module for checking what files have to be downloaded from the source
+"""
+
 import urllib.request
 import re
 import warnings

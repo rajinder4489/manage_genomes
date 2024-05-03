@@ -1,7 +1,9 @@
-import os
+"""
+Module for checking what paths on the url exist
+"""
+
 import shutil
 import urllib.request
-import re
 import warnings
 from itertools import product
 from bs4 import BeautifulSoup
@@ -64,7 +66,6 @@ def combination_checks_ensembl(config):
                 assembly = "  ".join(all_assemblies[i:i+assembly_per_line])
                 colored_assembly = f"{GREEN}{assembly}{COLOR_END}"
                 print(colored_assembly)
-            #raise ValueError(f"The provided assembly '{a}' is not available in Ensembl")
             warnings.warn(f"The provided assembly '{a}' is not available in Ensembl", MissingValueCombination)
             continue
 
