@@ -58,13 +58,18 @@ for script in script_files:
 # Downloads
 if(config[source]["fasta"]["download"]):
     fasta_download_path = path_checker(name = "FASTA download", specific_path = config[source]["fasta"]["local_path"], general_path = config["local"]["path_genome"])
+else:
+    fasta_download_path = "."
 
 if(config[source]["annotation"]["download"]):
     annotation_download_path = path_checker(name = "ANNOTATION download", specific_path = config[source]["annotation"]["local_path"], general_path = config["local"]["path_genome"])
+else:
+    annotation_download_path = "."
 
 if(config[source]["ensembl_repeats"]["download"]):
     ensembl_repeats_download_path = path_checker(name = "ENSEMBL REPEATS download", specific_path = config[source]["annotation"]["local_path"], general_path = config["local"]["path_genome"])
-
+else:
+    ensembl_repeats_download_path = "."
 
 # Indices
 if(config["build_indices"]["bowtie1"]["run"]):
@@ -115,7 +120,7 @@ if source == "ensembl":
 elif source == "refseq":
     downloadable_files = downloadable_refseq(config, working_dict)
 
-
+print(downloadable_files)
 # targets ############
 
 targets = []
@@ -139,6 +144,7 @@ for key, values in downloadable_files.items():
             
             targets.append(os.path.join(fasta_download_path, species, f"{assembly}_{release}_{seqtype}", file))
 
+    
     if(config["ensembl"]["annotation"]["download"]):
         for file in anno_files:
             if(any(gtf_derivatives_create)):
@@ -169,6 +175,16 @@ for key, values in downloadable_files.items():
     if(source == "ensembl" and 
         config["build_indices"]["star"]["run"]):
         targets.append(os.path.join(star_indices_path, f"{species}", f"{assembly}_{release}_{seqtype}", "SA"))
+
+
+    if(source == "ensembl" and 
+        config["build_indices"]["kallisto"]["run"]):
+        targets.append(os.path.join(kallisto_indices_path, f"{species}", f"{assembly}_{release}_{seqtype}", f"{species}.idx"))
+
+
+    if(config["annotation_files"]["gene_transcript_relation"]["create"]):
+        targets.append(os.path.join(annotation_download_path, f"{species}", f"{assembly}_{release}_annotation", "gene-transcript.txt"))
+
 
 targets = list(set(targets))
 print('\n\n'.join(map(str, targets)) + '\n\n')
@@ -203,6 +219,6 @@ include: "rules/star_index.smk"
 
 # GTF derivatives #
 #include: "rules/bed.smk"
-#include: "rules/gene_transcript.smk"
+include: "rules/gene_transcript.smk"
 #include: "rules/igv.smk"
 #include: "rules/refflat.smk"

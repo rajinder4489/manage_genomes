@@ -1,11 +1,10 @@
 # gene-transcript-relation file (kallisto)
 rule create_gene_transcript_file:
     input:
-        expand(os.path.join(GENOME_DOWNLOAD_PATH, SPECIES, ASSEMBLY, RELEASE, "annotation", "{file}.gtf"), file = anno_extensionless)
-    
+        gtf_file = glob.glob(os.path.join(annotation_download_path, f"{species}", f"{assembly}_{release}_annotation", "*gtf"))
+
     output:
-        expand(os.path.join(GENOME_DOWNLOAD_PATH, SPECIES, ASSEMBLY, RELEASE, "annotation", "{file}_gene-transcript.txt"), file = anno_extensionless)
-        #os.path.join(GENOME_DOWNLOAD_PATH, SPECIES, ASSEMBLY, RELEASE, "annotation", "{anno_extensionless}_gene-transcript.txt")
+        gt_file = os.path.join(annotation_download_path, f"{species}", f"{assembly}_{release}_annotation", "gene-transcript.txt")
 
     shell:
         """
@@ -18,5 +17,5 @@ rule create_gene_transcript_file:
                 else if (kv[1] == "transcript_id") ti=substr(kv[2], 2, length(kv[2])-2);
             }}
             print gi"\t"ti"\t"gn;
-        }}' {input} > {output}
+        }}' {input.gtf_file} > {output.gt_file}
         """
