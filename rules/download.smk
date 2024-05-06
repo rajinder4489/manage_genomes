@@ -27,11 +27,11 @@ rule download_annotation_ensembl:
 
 rule download_genome_ensembl:
     output:
-        dynamic(os.path.join(fasta_download_path, "{species}", "{assembly}_{release}_{seqtype}", "{a_file}")) if config["ensembl"]["fasta"]["download"] else "."
+        dynamic(os.path.join(fasta_download_path, "{species}", "{assembly}_{release}_{seqtype}", "{g_file}")) if config["ensembl"]["fasta"]["download"] else "."
 
     wildcard_constraints:
         g_file = ".*.fa.gz|CHECKSUMS",
-        seq_type = "dna|cdna|cds|ncrna|pep|dna_index"
+        seqtype = "dna|cdna|cds|ncrna|pep|dna_index"
     
     run:
         if config["ensembl"]["fasta"]["download"]:

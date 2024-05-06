@@ -11,7 +11,6 @@ from os.path import exists, abspath
 from bs4 import BeautifulSoup
 import urllib.request
 import re
-import glob
 import random
 import shutil
 
@@ -78,7 +77,7 @@ if(config["build_indices"]["bowtie2"]["run"]):
 
 if(config["build_indices"]["bwa"]["run"]):
     bwa_indices_path = path_checker(name = "BWA index", specific_path = config["build_indices"]["bwa"]["local_path"], general_path = config["local"]["path_indices"])
-    bwa_indices_path = os.path.join(bwa_indices_path, "indices", "bowtie2")
+    bwa_indices_path = os.path.join(bwa_indices_path, "indices", "bwa")
 
 if(config["build_indices"]["cellranger"]["run"]):
     cellranger_indices_path = path_checker(name = "CELLRANGER index", specific_path = config["build_indices"]["cellranger"]["local_path"], general_path = config["local"]["path_indices"])
@@ -123,51 +122,56 @@ targets = []
 files_to_decompress_fa = []
 files_to_decompress_anno = []
 
-if(config["ensembl"]["fasta"]["download"] or 
-    config["ensembl"]["annotation"]["download"]):
+for key, values in downloadable_files.items():
     
-    for key, values in downloadable_files.items():
+    assembly = values["assembly"]
+    release = values["release"]
+    species = values["species"]
+    seqtype = values["seqtype"]
+    genome_files = values["fasta"]
+    anno_files = values["annotation"]
         
-        assembly = values["assembly"]
-        release = values["release"]
-        species = values["species"]
-        seqtype = values["seqtype"]
-        genome_files = values["fasta"]
-        anno_files = values["annotation"]
+    if(config["ensembl"]["fasta"]["download"]):
+        for file in genome_files:
+            if(any(indices_run)):
+                files_to_decompress_fa.append(os.path.join(fasta_download_path, species, f"{assembly}_{release}_{seqtype}", file))
+                file = os.path.splitext(file)[0]
+            
+            targets.append(os.path.join(fasta_download_path, species, f"{assembly}_{release}_{seqtype}", file))
 
-        if(config["ensembl"]["fasta"]["download"]):
-            for file in genome_files:
-                if(any(indices_run)):
-                    files_to_decompress_fa.append(os.path.join(fasta_download_path, species, f"{assembly}_{release}_{seqtype}", file))
-                    file = os.path.splitext(file)[0]
+    if(config["ensembl"]["annotation"]["download"]):
+        for file in anno_files:
+            if(any(gtf_derivatives_create)):
                 
-                targets.append(os.path.join(fasta_download_path, species, f"{assembly}_{release}_{seqtype}", file))
-
-        if(config["ensembl"]["annotation"]["download"]):
-            for file in anno_files:
-                if(any(gtf_derivatives_create)):
-                    
-                    files_to_decompress_anno.append(os.path.join(annotation_download_path, species, f"{assembly}_{release}_annotation", file))
-                    file = os.path.splitext(file)[0]
-                
-                targets.append(os.path.join(annotation_download_path, species, f"{assembly}_{release}_annotation", file))
+                files_to_decompress_anno.append(os.path.join(annotation_download_path, species, f"{assembly}_{release}_annotation", file))
+                file = os.path.splitext(file)[0]
+            
+            targets.append(os.path.join(annotation_download_path, species, f"{assembly}_{release}_annotation", file))
 
 
-if(source == "ensembl" or 
-    config["build_indices"]["bowtie1"]["run"]):
+    if(source == "ensembl" and 
+        config["build_indices"]["bowtie1"]["run"]):
+        targets.extend(os.path.join(bowtie1_indices_path, species, f"{assembly}_{release}_{seqtype}", f"{species}.{i}.ebwt") for i in range(1, 5))
+        targets.extend(os.path.join(bowtie1_indices_path, species, f"{assembly}_{release}_{seqtype}", f"{species}.rev.{i}.ebwt") for i in range(1, 3))
+
+
+    if(source == "ensembl" and 
+        config["build_indices"]["bowtie2"]["run"]):
+        targets.extend(os.path.join(bowtie2_indices_path, species, f"{assembly}_{release}_{seqtype}", f"{species}.{i}.bt2") for i in range(1, 5))
+        targets.extend(os.path.join(bowtie2_indices_path, species, f"{assembly}_{release}_{seqtype}", f"{species}.rev.{i}.bt2") for i in range(1, 3))
+
     
-    for key, values in downloadable_files.items():
-        
-        assembly = values["assembly"]
-        release = values["release"]
-        species = values["species"]
-        seqtype = values["seqtype"]
-        genome_files = values["fasta"]
-        anno_files = values["annotation"]
+    if(source == "ensembl" and 
+        config["build_indices"]["bwa"]["run"]):
+        targets.append(os.path.join(bwa_indices_path, f"{species}", f"{assembly}_{release}_{seqtype}", f"{species}.{i}") for i in ["amb", "ann", "bwt", "pac", "sa"])
 
+
+    if(source == "ensembl" and 
+        config["build_indices"]["star"]["run"]):
+        targets.append(os.path.join(star_indices_path, f"{species}", f"{assembly}_{release}_{seqtype}", "SA"))
 
 targets = list(set(targets))
-#print('\n\n'.join(map(str, targets)) + '\n\n')
+print('\n\n'.join(map(str, targets)) + '\n\n')
 
 
 # rules ############
@@ -187,13 +191,13 @@ if(any(gtf_derivatives_create)):
     decompress(files_to_decompress_anno)
 
 # Indices #
-#include: "rules/bowtie1_index.smk"
-#include: "rules/bowtie2_index.smk"
-#include: "rules/bwa_index.smk"
+include: "rules/bowtie1_index.smk"
+include: "rules/bowtie2_index.smk"
+include: "rules/bwa_index.smk"
 #include: "rules/cellranger_index.smk"
 #include: "rules/cellranger_vdj_index.smk"
-#include: "rules/kallisto_index.smk"
-#include: "rules/star_index.smk"
+include: "rules/kallisto_index.smk"
+include: "rules/star_index.smk"
 #include: "rules/xengsort_index.smk"
 
 

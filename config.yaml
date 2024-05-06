@@ -21,28 +21,22 @@ ensembl:
         base_url: https://ftp.ensembl.org/pub
         assembly: [grch38]
         release: [release-111]
-        species: [ciona_intestinalis] #acanthochromis_polyacanthus
+        species: [ciona_intestinalis] #acanthochromis_polyacanthus, ciona_intestinalis, 
         seq_type: [dna]
         fasta: 
-                download: false
-                unzip: true
-                # Make unzip true for any downstream processing such as building indices
+                download: true
                 local_path: 
                 # This takes precedence. Define if other than path_genome. Sub folders will be created; refer local
                 file_patterns_include: [sm]
                 file_patterns_exclude: [rm, primary, nonchromosomal, chromosome]
         annotation: 
                 download: true
-                unzip: true
-                # Make unzip true for any downstream processing such as creating any gtf derivaties 
                 local_path: 
                 #  This takes precedence. Define if other than path_genome. Sub folders will be created; refer local
                 file_patterns_include: [gtf]
-                file_patterns_exclude: [abinitio, chr, chromosome, CHECKSUMS]
+                file_patterns_exclude: [abinitio, chromosome, chr.gtf, CHECKSUMS]
         ensembl_repeats: 
                 download: false
-                unzip: true
-                # Make unzip true for any downstream processing such as ...
                 local_path: 
                 #  This takes precedence. Define if other than path_other_files. Sub folders will be created; refer local
 
@@ -56,7 +50,7 @@ refseq:
 
 other_files:
         vep: 
-                download: true
+                download: trfalseue
                 base_url: ftp path
                 local_path: 
                 #  This takes precedence. Define if other than path_other_files. Sub folders will be created; refer local
@@ -69,12 +63,12 @@ build_indices:
                 #  This takes precedence. Define if other than path_indices. Sub folders will be created; refer local
                 tool_params: --threads 10
         bowtie2: 
-                run: false
+                run: true
                 local_path: 
                 #  This takes precedence. Define if other than path_indices. Sub folders will be created; refer local
                 tool_params: --threads 10 --seed 123
         bwa: 
-                run: false
+                run: true
                 local_path: 
                 #  This takes precedence. Define if other than path_indices. Sub folders will be created; refer local
                 tool_params: -a is 
@@ -94,12 +88,12 @@ build_indices:
                 local_path: 
                 #  This takes precedence. Define if other than path_indices. Sub folders will be created; refer local
                 type: nac
-                # other allowed option is standard
+                # values for type are 'nac' or 'standard'
                 tool_params: -t 10
                 # not -i
                 # pay attention to if you are building standard index (seq_type: cdna) or nac index (seq_type: dna)
         star: 
-                run: false
+                run: true
                 local_path: 
                 #  This takes precedence. Define if other than path_indices. Sub folders will be created; refer local
                 tool_params: --genomeSAindexNbases 12
@@ -114,10 +108,11 @@ build_indices:
 # needs to have the gtf file being downloaded in the current run or already exist at a path to create the following files
 annotation_files:
         path_to_gtf: 
-        # leave path_to_gtf blank when it is also downloaded during the current run
+        # leave path_to_gtf blank when it is downloaded during the current run
                 create: false
+                # Always keep this false; do not remove
         gene_transcript_relation: 
-                create: false
+                create: true
         bed: 
                 create: false
         refflat: 

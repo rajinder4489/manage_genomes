@@ -1,22 +1,22 @@
 # bwa ##########
 rule bwa_index:
     input:
-        fasta = expand(os.path.join(GENOME_DOWNLOAD_PATH, SPECIES, ASSEMBLY, RELEASE, SEQTYPE, "{file}"), file = only_fasta)
+        fasta_files = glob.glob(os.path.join(fasta_download_path, f"{species}", f"{assembly}_{release}_{seqtype}", "*fa"))
     
     output:
-        os.path.join(INDICES_BUILD_PATH, "indices", "bwa", SPECIES, ASSEMBLY, RELEASE, SEQTYPE, f"{SPECIES}.sa")
+        indices = (os.path.join(bwa_indices_path, f"{species}", f"{assembly}_{release}_{seqtype}", f"{species}.{i}") for i in ["amb", "ann", "bwt", "pac", "sa"]) if config["build_indices"]["bwa"]["run"] else "."
 
     params:
-        params = config["indices"]["bwa"]["tool_params"]
+        params = config["build_indices"]["bwa"]["tool_params"]
 
     run:
-        if config["indices"]["bwa"]["run"]:
+        if config["build_indices"]["bwa"]["run"]:
             print("Making the bwa indices")
             shell(
                 """
                 module load apps/bwa
-                mkdir -p {INDICES_BUILD_PATH}/indices/bwa/{SPECIES}/{ASSEMBLY}/{RELEASE}/
-                bwa index {params.params} -p {INDICES_BUILD_PATH}/indices/bwa/{SPECIES}/{ASSEMBLY}/{RELEASE}/{SEQTYPE}/{SPECIES} <(cat {input})
+                mkdir -p {bwa_indices_path}/{species}/{assembly}_{release}_{seqtype}
+                bwa index {params.params} -p {bwa_indices_path}/{species}/{assembly}_{release}_{seqtype}/{species} <(cat {input})
                 module unload apps/bwa
                 """
                 )
