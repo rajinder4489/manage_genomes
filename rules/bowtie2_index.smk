@@ -10,6 +10,9 @@ rule bowtie2_index:
         indices = [(os.path.join(bowtie2_indices_path, f"{species}", f"{assembly}_{release}_{seqtype}", f"{species}.{i}.bt2") for i in range(1, 5)) if config["build_indices"]["bowtie2"]["run"] else "."] +
                     [(os.path.join(bowtie2_indices_path, f"{species}", f"{assembly}_{release}_{seqtype}", f"{species}.rev.{i}.bt2") for i in range(1, 3)) if config["build_indices"]["bowtie2"]["run"] else "."]
 
+    wildcard_constraints:
+        seqtype = "dna|cdna|cds|ncrna"
+    
     params:
         fasta_files = lambda wildcards, input: ",".join(f for f in input),
         params = config["build_indices"]["bowtie2"]["tool_params"]

@@ -1,22 +1,25 @@
 # kallisto ##########
 rule kallisto_index:
     input:
-        fasta = expand(os.path.join(GENOME_DOWNLOAD_PATH, SPECIES, ASSEMBLY, RELEASE, SEQTYPE, "{file}"), file = only_fasta)
+        fasta_files = glob.glob(os.path.join(fasta_download_path, f"{species}", f"{assembly}_{release}_{seqtype}", "*fa")),
             
     output:
-        os.path.join(INDICES_BUILD_PATH, "indices", "kallisto", SPECIES, ASSEMBLY, RELEASE, SEQTYPE, f"{SPECIES}.idx")
+        indices = (os.path.join(kallisto_indices_path, f"{species}", f"{assembly}_{release}_{seqtype}", f"{species}.idx")) if config["build_indices"]["kallisto"]["run"] else "."
 
+    wildcard_constraints:
+        seqtype = "dna|cdna|cds|ncrna"
+    
     params:
-        params = config["indices"]["kallisto"]["tool_params"]
+        params = config["build_indices"]["kallisto"]["tool_params"]
 
     run:
-        if config["indices"]["kallisto"]["run"]:
+        if config["build_indices"]["kallisto"]["run"]:
             print("Making the kallisto indices")
             shell(
                 """
                 module load apps/kallisto
-                mkdir -p {INDICES_BUILD_PATH}/indices/kallisto/{SPECIES}/{ASSEMBLY}/{RELEASE}/{SEQTYPE}/
-                kallisto index -i {INDICES_BUILD_PATH}/indices/kallisto/{SPECIES}/{ASSEMBLY}/{RELEASE}/{SEQTYPE}/{SPECIES}.idx {input.fasta}
+                mkdir -p {kallisto_indices_path}/{species}/{assembly}_{release}_{seqtype}
+                kallisto index -i {kallisto_indices_path}/{species}/{assembly}_{release}_{seqtype}/{species}.idx {input.fasta_files}
                 module unload apps/kallisto
                 """
                 )

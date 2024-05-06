@@ -6,6 +6,9 @@ rule bwa_index:
     output:
         indices = (os.path.join(bwa_indices_path, f"{species}", f"{assembly}_{release}_{seqtype}", f"{species}.{i}") for i in ["amb", "ann", "bwt", "pac", "sa"]) if config["build_indices"]["bwa"]["run"] else "."
 
+    wildcard_constraints:
+        seqtype = "dna|cdna|cds|ncrna"
+    
     params:
         params = config["build_indices"]["bwa"]["tool_params"]
 
