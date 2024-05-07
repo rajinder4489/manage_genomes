@@ -1,13 +1,18 @@
-
 # igv file
 rule create_igv:
     input:
-        os.path.join(GENOME_DOWNLOAD_PATH, SPECIES, ASSEMBLY, RELEASE, "annotation", "{anno_extensionless}.gtf")
+        gtf_file = os.path.join(annotation_download_path, "{s}", "{a}_{r}_annotation", "gtf.gtf")
     
-    #output:
-    #    os.path.join(GENOME_DOWNLOAD_PATH, SPECIES, ASSEMBLY, RELEASE, "annotation", "{anno_extensionless}.some")
+    output:
+        igv_file = os.path.join(annotation_download_path, "{s}", "{a}_{r}_annotation", "annotation.igv.gtf")
+    
+    log:
+        f"logs/igv.gtf/{species}/{assembly}_{release}_annotation/log.log"
 
     shell:
         """
-        
+        (
+            igvtools sort {input.gtf} {output.gtf}
+		    igvtools index {output.gtf}) >& {log}
+        ) &> {log}
         """

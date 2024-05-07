@@ -1,25 +1,30 @@
 # bwa ##########
 rule bwa_index:
     input:
-        fasta_files = glob.glob(os.path.join(fasta_download_path, f"{species}", f"{assembly}_{release}_{seqtype}", "*fa"))
+        fasta_files = os.path.join(fasta_download_path, "{s}", "{a}_{r}_{t}", "genome.fa")
     
     output:
-        indices = (os.path.join(bwa_indices_path, f"{species}", f"{assembly}_{release}_{seqtype}", f"{species}.{i}") for i in ["amb", "ann", "bwt", "pac", "sa"]) if config["build_indices"]["bwa"]["run"] else "."
+        indices = os.path.join(bwa_indices_path, "{s}", "{a}_{r}_{t}", "{s}.sa") if config["build_indices"]["bwa"]["run"] else "."
 
     wildcard_constraints:
-        seqtype = "dna|cdna|cds|ncrna"
+        t = "dna|cdna|cds|ncrna"
     
     params:
         params = config["build_indices"]["bwa"]["tool_params"]
 
+    log:
+        "logs/bwa_index/{s}/{a}_{r}_{t}/log.log"
+    
     run:
         if config["build_indices"]["bwa"]["run"]:
-            print("Making the bwa indices")
             shell(
                 """
-                module load apps/bwa
-                mkdir -p {bwa_indices_path}/{species}/{assembly}_{release}_{seqtype}
-                bwa index {params.params} -p {bwa_indices_path}/{species}/{assembly}_{release}_{seqtype}/{species} <(cat {input})
-                module unload apps/bwa
+                (
+                    echo "Making the bwa indices"
+                    module load apps/bwa
+                    mkdir -p {bwa_indices_path}/{wildcards.s}/{wildcards.a}_{wildcards.r}_{wildcards.t}
+                    bwa index {params.params} -p {bwa_indices_path}/{wildcards.s}/{wildcards.a}_{wildcards.r}_{wildcards.t}/{wildcards.s} <(cat {input.fasta_files})
+                    module unload apps/bwa
+                ) &> {log}
                 """
                 )

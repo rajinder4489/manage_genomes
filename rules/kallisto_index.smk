@@ -1,25 +1,30 @@
 # kallisto ##########
 rule kallisto_index:
     input:
-        fasta_files = glob.glob(os.path.join(fasta_download_path, f"{species}", f"{assembly}_{release}_{seqtype}", "*fa")),
+        fasta_files = os.path.join(fasta_download_path, "{s}", "{a}_{r}_{t}", "genome.fa")
             
     output:
-        indices = (os.path.join(kallisto_indices_path, f"{species}", f"{assembly}_{release}_{seqtype}", f"{species}.idx")) if config["build_indices"]["kallisto"]["run"] else "."
+        indices = os.path.join(kallisto_indices_path, "{s}", "{a}_{r}_{t}", "{s}.idx") if config["build_indices"]["kallisto"]["run"] else "."
 
     wildcard_constraints:
-        seqtype = "dna|cdna|cds|ncrna"
+        t = "dna|cdna|cds|ncrna"
     
     params:
         params = config["build_indices"]["kallisto"]["tool_params"]
 
+    log:
+        "logs/kallisto_index/{s}/{a}_{r}_{t}/file.log"
+
     run:
         if config["build_indices"]["kallisto"]["run"]:
-            print("Making the kallisto indices")
             shell(
                 """
-                module load apps/kallisto
-                mkdir -p {kallisto_indices_path}/{species}/{assembly}_{release}_{seqtype}
-                kallisto index -i {kallisto_indices_path}/{species}/{assembly}_{release}_{seqtype}/{species}.idx {input.fasta_files}
-                module unload apps/kallisto
+                (
+                    echo "Making the kallisto indices"
+                    module load apps/kallisto
+                    mkdir -p {kallisto_indices_path}/{wildcards.s}/{wildcards.a}_{wildcards.r}_{wildcards.t}
+                    kallisto index -i {kallisto_indices_path}/{wildcards.s}/{wildcards.a}_{wildcards.r}_{wildcards.t}/{wildcards.s}.idx {input.fasta_files}
+                    module unload apps/kallisto
+                ) &> {log}
                 """
                 )
