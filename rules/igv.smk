@@ -7,7 +7,7 @@ rule create_igv:
         igv_file = os.path.join(annotation_download_path, "{s}", "{a}_{r}_annotation", "annotation.igv.gtf")
     
     log:
-        f"logs/igv.gtf/{species}/{assembly}_{release}_annotation/log.log"
+        f"logs/{wildcards.s}_{wildcards.a}_{wildcards.r}_annotation/igv.gtf.log"
 
     shell:
         """

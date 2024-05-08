@@ -5,11 +5,11 @@
 seed: 123
 
 local:
-        path_genome: "."
+        path_genome: "/dcgc/analysis/development/rgupta/github/manage_genomes"
         # hierarchy of sub folders: 
-        path_indices: "."
+        path_indices: "/dcgc/analysis/development/rgupta/github/manage_genomes"
         # hierarchy of sub folders: cds
-        path_other_files: "."
+        path_other_files: "/dcgc/analysis/development/rgupta/github/manage_genomes"
         # hierarchy of sub folders: 
 
 source: ensembl
@@ -21,21 +21,21 @@ ensembl:
         base_url: https://ftp.ensembl.org/pub
         assembly: [grch38]
         release: [release-111]
-        species: [ciona_intestinalis] #acanthochromis_polyacanthus, ciona_intestinalis, 
+        species: [ciona_intestinalis, acanthochromis_polyacanthus] #acanthochromis_polyacanthus, ciona_intestinalis, 
         seq_type: [dna]
-        fasta: 
-                download: true
-                local_path: 
-                # This takes precedence. Define if other than path_genome. Sub folders will be created; refer local
-                file_patterns_include: [sm]
-                file_patterns_exclude: [rm, primary, nonchromosomal, chromosome]
         annotation: 
                 download: true
                 local_path: 
                 #  This takes precedence. Define if other than path_genome. Sub folders will be created; refer local
                 file_patterns_include: [gtf]
                 file_patterns_exclude: [abinitio, chromosome, chr.gtf, CHECKSUMS]
-        ensembl_repeats: 
+        fasta: 
+                download: true
+                local_path: 
+                # This takes precedence. Define if other than path_genome. Sub folders will be created; refer local
+                file_patterns_include: [sm]
+                file_patterns_exclude: [rm, primary, nonchromosomal, chromosome]
+        repeats: 
                 download: false
                 local_path: 
                 #  This takes precedence. Define if other than path_other_files. Sub folders will be created; refer local
@@ -58,43 +58,37 @@ other_files:
 
 build_indices:
         bowtie1:
-                run: false
+                run: true
                 local_path: 
                 #  This takes precedence. Define if other than path_indices. Sub folders will be created; refer local
                 tool_params: --threads 10
         bowtie2: 
-                run: false
+                run: true
                 local_path: 
                 #  This takes precedence. Define if other than path_indices. Sub folders will be created; refer local
                 tool_params: --threads 10 --seed 123
         bwa: 
-                run: false
+                run: true
                 local_path: 
                 #  This takes precedence. Define if other than path_indices. Sub folders will be created; refer local
                 tool_params: -a is 
                 # not -p
         cellranger: 
-                run: true
+                run: false
                 local_path: 
                 #  This takes precedence. Define if other than path_indices. Sub folders will be created; refer local
                 tool_params: --nthreads 10
                 # not --genome, --fasta, --genes, --output-dir
-        cellranger_vdj:
-                run: false
-                local_path: 
-                #  This takes precedence. Define if other than path_indices. Sub folders will be created; refer local
-                tool_params: 
         kallisto: 
-                run: false
+                run: true
                 local_path: 
                 #  This takes precedence. Define if other than path_indices. Sub folders will be created; refer local
                 type: nac
-                # values for type are 'nac' or 'standard'
+                # values for type are 'nac' (seq_type: dna) or 'standard' (seq_type: cdna)
                 tool_params: -t 10
                 # not -i
-                # pay attention to if you are building standard index (seq_type: cdna) or nac index (seq_type: dna)
         star: 
-                run: false
+                run: true
                 local_path: 
                 #  This takes precedence. Define if other than path_indices. Sub folders will be created; refer local
                 tool_params: --genomeSAindexNbases 12
@@ -106,14 +100,13 @@ build_indices:
                 tool_params:
 
 
-# needs to have the gtf file being downloaded in the current run or already exist at a path to create the following files
+# needs to have the gtf file being downloaded in the current run or already exist at a path (path_to_gtf) to create the following files
 annotation_files:
         path_to_gtf: 
-        # leave path_to_gtf blank when it is downloaded during the current run
-                create: false
-                # Always keep this false; do not remove
+        # This takes precedence; leave it blank when the gtf is downloaded during the current run
+        # if want to use an already existing gtf, put [source][annotation][download] to false
         gene_transcript_relation: 
-                create: false
+                create: true
         bed: 
                 create: false
         refflat: 

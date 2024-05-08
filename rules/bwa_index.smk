@@ -4,7 +4,7 @@ rule bwa_index:
         fasta_files = os.path.join(fasta_download_path, "{s}", "{a}_{r}_{t}", "genome.fa")
     
     output:
-        indices = os.path.join(bwa_indices_path, "{s}", "{a}_{r}_{t}", "{s}.sa") if config["build_indices"]["bwa"]["run"] else "."
+        indices = os.path.join(bwa_indices_path, "{s}", "{a}_{r}_{t}", "{s}.sa")
 
     wildcard_constraints:
         t = "dna|cdna|cds|ncrna"
@@ -12,8 +12,8 @@ rule bwa_index:
     params:
         params = config["build_indices"]["bwa"]["tool_params"]
 
-    log:
-        "logs/bwa_index/{s}/{a}_{r}_{t}/log.log"
+#    log:
+#        "logs/{s}_{a}_{r}_{t}/bwa_index.log"
     
     run:
         if config["build_indices"]["bwa"]["run"]:
@@ -25,6 +25,7 @@ rule bwa_index:
                     mkdir -p {bwa_indices_path}/{wildcards.s}/{wildcards.a}_{wildcards.r}_{wildcards.t}
                     bwa index {params.params} -p {bwa_indices_path}/{wildcards.s}/{wildcards.a}_{wildcards.r}_{wildcards.t}/{wildcards.s} <(cat {input.fasta_files})
                     module unload apps/bwa
-                ) &> {log}
+                )
                 """
                 )
+# &> {log}

@@ -6,8 +6,8 @@ rule bowtie2_index:
         fasta_files = os.path.join(fasta_download_path, "{s}", "{a}_{r}_{t}", "genome.fa")
 
     output:
-        indices = [os.path.join(bowtie2_indices_path, "{s}", "{a}_{r}_{t}", "{s}.4.bt2") if config["build_indices"]["bowtie2"]["run"] else "."] +
-                    [os.path.join(bowtie2_indices_path, "{s}", "{a}_{r}_{t}", "{s}.rev.2.bt2") if config["build_indices"]["bowtie2"]["run"] else "."]
+        indices = [os.path.join(bowtie2_indices_path, "{s}", "{a}_{r}_{t}", "{s}.4.bt2")] +
+                    [os.path.join(bowtie2_indices_path, "{s}", "{a}_{r}_{t}", "{s}.rev.2.bt2")]
 
     wildcard_constraints:
         t = "dna|cdna|cds|ncrna"
@@ -15,8 +15,8 @@ rule bowtie2_index:
     params:
         params = config["build_indices"]["bowtie2"]["tool_params"]
 
-    log:
-        "logs/bowtie2_index/{s}/{a}_{r}_{t}/log.log"
+#    log:
+#        "logs/{wildcards.s}_{wildcards.a}_{wildcards.r}_{wildcards.t}/bowtie2_index.log"
 
     run:
         if config["build_indices"]["bowtie2"]["run"]:
@@ -28,6 +28,6 @@ rule bowtie2_index:
                     mkdir -p {bowtie2_indices_path}/{wildcards.s}/{wildcards.a}_{wildcards.r}_{wildcards.t}
                     bowtie2-build {params.params} {input.fasta_files} {bowtie2_indices_path}/{wildcards.s}/{wildcards.a}_{wildcards.r}_{wildcards.t}/{wildcards.s}
                     module unload apps/bowtie2
-                ) &> {log}
+                )
                 """
                 )

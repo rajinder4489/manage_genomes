@@ -5,7 +5,7 @@ rule star_index:
         gtf_file = os.path.join(annotation_download_path, "{s}", "{a}_{r}_annotation", "gtf.gtf")
         
     output:
-        indices = (os.path.join(star_indices_path, "{s}", "{a}_{r}_{t}", "SA")) if config["build_indices"]["star"]["run"] else "."
+        indices = (os.path.join(star_indices_path, "{s}", "{a}_{r}_{t}", "SA"))
 
     wildcard_constraints:
         t = "dna|cdna|cds|ncrna"
@@ -13,8 +13,8 @@ rule star_index:
     params:
         params = config["build_indices"]["star"]["tool_params"]
 
-    log:
-        "logs/star_indices/{s}/{a}_{r}_{t}/log.log"
+#    log:
+#        "logs/{wildcards.s}_{wildcards.a}_{wildcards.r}_{wildcards.t}/star_indices.log"
 
     run:
         if config["build_indices"]["star"]["run"]:
@@ -27,6 +27,6 @@ rule star_index:
                     mkdir -p {star_indices_path}/{wildcards.s}/{wildcards.a}_{wildcards.r}_{wildcards.t}
                     STAR --runMode genomeGenerate --genomeDir {star_indices_path}/{wildcards.s}/{wildcards.a}_{wildcards.r}_{wildcards.t} --sjdbGTFfile {input.gtf_file} --genomeFastaFiles {input.fasta_files} {params.params}
                     module unload apps/star
-                ) &> {log}
+                )
                 """
                 )

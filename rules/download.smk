@@ -2,13 +2,11 @@ import urllib.request
 
 rule download_annotation_ensembl:
     output:
-        dynamic(os.path.join(annotation_download_path, "{s}", "{a}_{r}_annotation", "gtf.gtf")) if config["ensembl"]["annotation"]["download"] else "."
-
-    wildcard_constraints:
-        a_file = ".*.gtf.gz|CHECKSUMS"
+        #os.path.join(annotation_download_path, "{s}", "{a}_{r}_annotation", "gtf.gtf") if config["ensembl"]["annotation"]["download"] else "."
+        os.path.join(annotation_download_path, "{s}", "{a}_{r}_annotation", "gtf.gtf")
     
-    log:
-        "logs/download_ensembl/{s}/{a}_{r}_annotation/log.log"
+    #log:
+    #    "logs/{s}_{a}_{r}_downloads_ensembl/annotation.log"
     
     run:
         if config["ensembl"]["annotation"]["download"]:
@@ -35,21 +33,20 @@ rule download_annotation_ensembl:
                         ls -lha {fasta_download_path}/{species}/{assembly}_{release}_annotation/*.gtf.gz > {fasta_download_path}/{species}/{assembly}_{release}_annotation/readme.txt
                         zcat {fasta_download_path}/{species}/{assembly}_{release}_annotation/*.gtf.gz > {fasta_download_path}/{species}/{assembly}_{release}_annotation/gtf.gtf
                         rm -rf {fasta_download_path}/{species}/{assembly}_{release}_annotation/*.gtf.gz
-                    ) &> {log}
+                    )
                     """
                     )
 
 
 rule download_genome_ensembl:
     output:
-        dynamic(os.path.join(fasta_download_path, "{s}", "{a}_{r}_{t}", "genome.fa")) if config["ensembl"]["fasta"]["download"] else "."
+        os.path.join(fasta_download_path, "{s}", "{a}_{r}_{t}", "genome.fa")
 
     wildcard_constraints:
-        g_file = ".*.fa.gz|CHECKSUMS",
         t = "dna|cdna|cds|ncrna|pep|dna_index"
     
-    log:
-        "logs/download_ensembl/{s}/{a}_{r}_{t}/log.log"
+    #log:
+    #    "logs/{s}_{a}_{r}_download_ensembl/{t}.log"
 
     run:
         if config["ensembl"]["fasta"]["download"]:
@@ -76,20 +73,20 @@ rule download_genome_ensembl:
                         ls -lha {fasta_download_path}/{species}/{assembly}_{release}_{seqtype}/*.fa.gz > {fasta_download_path}/{species}/{assembly}_{release}_{seqtype}/readme.txt
                         zcat {fasta_download_path}/{species}/{assembly}_{release}_{seqtype}/*.fa.gz > {fasta_download_path}/{species}/{assembly}_{release}_{seqtype}/genome.fa
                         rm -rf {fasta_download_path}/{species}/{assembly}_{release}_{seqtype}/*.fa.gz
-                    ) &> {log}
+                    )
                     """
                     )
 
 
 rule download_repeats_ensembl:
     output:
-        dynamic(os.path.join(ensembl_repeats_download_path, "{s}", "{a}_{r}_repeats", "{r_file}")) if config["ensembl"]["ensembl_repeats"]["download"] else "."
+        os.path.join(ensembl_repeats_download_path, "{s}", "{a}_{r}_repeats", "{r_file}")
 
     wildcard_constraints:
         r_file = ".*.txt.gz",
 
-    log:
-        "logs/downloads_ensembl/{wildcards.s}/{wildcards.a}_{wildcards.r}_repeats/{wildcards.r_file}.log"
+    #log:
+    #    "logs/{s}_{a}_{r}_downloads_ensembl/repeats.log"
     
     run:
         if config["ensembl"]["fasta"]["download"]:

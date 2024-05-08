@@ -25,12 +25,6 @@ random.seed(config["seed"])
 source = config["source"]
 base_url = config[source]["base_url"]
 
-# Build indices
-indices_run = [value["run"] for value in config["build_indices"].values()]
-
-# GTF derivatives
-gtf_derivatives_create = [value["create"] for value in config["annotation_files"].values()]
-
 
 # Import all scripts
 # Define a function to filter script files
@@ -55,54 +49,81 @@ for script in script_files:
 
 # resources local base path ############
 
-# Downloads
+## Downloads
 if(config[source]["fasta"]["download"]):
     fasta_download_path = path_checker(name = "FASTA download", specific_path = config[source]["fasta"]["local_path"], general_path = config["local"]["path_genome"])
 else:
-    fasta_download_path = "."
+    fasta_download_path = os.getcwd()
 
 if(config[source]["annotation"]["download"]):
     annotation_download_path = path_checker(name = "ANNOTATION download", specific_path = config[source]["annotation"]["local_path"], general_path = config["local"]["path_genome"])
 else:
-    annotation_download_path = "."
+    annotation_download_path = os.getcwd()
 
-if(config[source]["ensembl_repeats"]["download"]):
+if(config[source]["repeats"]["download"]):
     ensembl_repeats_download_path = path_checker(name = "ENSEMBL REPEATS download", specific_path = config[source]["annotation"]["local_path"], general_path = config["local"]["path_genome"])
 else:
-    ensembl_repeats_download_path = "."
+    ensembl_repeats_download_path = os.getcwd()
 
-# Indices
+## Indices
+### bowtie1
 if(config["build_indices"]["bowtie1"]["run"]):
     bowtie1_indices_path = path_checker(name = "BOWTIE1 index", specific_path = config["build_indices"]["bowtie1"]["local_path"], general_path = config["local"]["path_indices"])
-    bowtie1_indices_path = os.path.join(bowtie1_indices_path, "indices", "bowtie1")
+else:
+    bowtie1_indices_path = os.getcwd()
 
+bowtie1_indices_path = os.path.join(bowtie1_indices_path, "indices", "bowtie1")
+
+### bowtie2
 if(config["build_indices"]["bowtie2"]["run"]):
     bowtie2_indices_path = path_checker(name = "BOWTIE2 index", specific_path = config["build_indices"]["bowtie2"]["local_path"], general_path = config["local"]["path_indices"])
-    bowtie2_indices_path = os.path.join(bowtie2_indices_path, "indices", "bowtie2")
+else:
+    bowtie2_indices_path = os.getcwd()
 
+bowtie2_indices_path = os.path.join(bowtie2_indices_path, "indices", "bowtie2")
+
+### bwa
 if(config["build_indices"]["bwa"]["run"]):
     bwa_indices_path = path_checker(name = "BWA index", specific_path = config["build_indices"]["bwa"]["local_path"], general_path = config["local"]["path_indices"])
-    bwa_indices_path = os.path.join(bwa_indices_path, "indices", "bwa")
+else:
+    bwa_indices_path = os.getcwd()
 
+bwa_indices_path = os.path.join(bwa_indices_path, "indices", "bwa")
+
+### cellranger
 if(config["build_indices"]["cellranger"]["run"]):
     cellranger_indices_path = path_checker(name = "CELLRANGER index", specific_path = config["build_indices"]["cellranger"]["local_path"], general_path = config["local"]["path_indices"])
-    cellranger_indices_path = os.path.join(cellranger_indices_path, "indices", "cellranger")
+else:
+    cellranger_indices_path = os.getcwd()
 
-if(config["build_indices"]["cellranger_vdj"]["run"]):
-    cellranger_vdj_indices_path = path_checker(name = "CELLRANGER VDJ index", specific_path = config["build_indices"]["cellranger_vdj"]["local_path"], general_path = config["local"]["path_indices"])
-    cellranger_vdj_indices_path = os.path.join(cellranger_vdj_indices_path, "indices", "cellranger_vdj")
+cellranger_indices_path = os.path.join(cellranger_indices_path, "indices", "cellranger")
 
+### kallisto
 if(config["build_indices"]["kallisto"]["run"]):
     kallisto_indices_path = path_checker(name = "KALLISTO index", specific_path = config["build_indices"]["kallisto"]["local_path"], general_path = config["local"]["path_indices"])
-    kallisto_indices_path = os.path.join(kallisto_indices_path, "indices", "kallisto")
+else:
+    kallisto_indices_path = os.getcwd()
 
+kallisto_indices_path = os.path.join(kallisto_indices_path, "indices", "kallisto")
+
+### star
 if(config["build_indices"]["star"]["run"]):
     star_indices_path = path_checker(name = "STAR index", specific_path = config["build_indices"]["star"]["local_path"], general_path = config["local"]["path_indices"])
-    star_indices_path = os.path.join(star_indices_path, "indices", "star")
+else:
+    star_indices_path = os.getcwd()
 
+star_indices_path = os.path.join(star_indices_path, "indices", "star")
+
+### xengsort
 if(config["build_indices"]["xengsort"]["run"]):
     xengsort_indices_path = path_checker(name = "XENGSORT index", specific_path = config["build_indices"]["xengsort"]["local_path"], general_path = config["local"]["path_indices"])
-    xengsort_indices_path = os.path.join(xengsort_indices_path, "indices", "xengsort")
+else:
+    xengsort_indices_path = os.getcwd()
+
+xengsort_indices_path = os.path.join(xengsort_indices_path, "indices", "xengsort")
+
+
+## GTF derivatives
 
 
 # Check what combinations exist ##############
@@ -195,19 +216,14 @@ rule all:
 # Downloads #
 include: "rules/download.smk"
 
-#if(any(indices_run)):
-#    decompress(files_to_decompress_fa)
-
-#if(any(gtf_derivatives_create)):
-#    decompress(files_to_decompress_anno)
 
 # Indices #
 include: "rules/bowtie1_index.smk"
 include: "rules/bowtie2_index.smk"
 include: "rules/bwa_index.smk"
-#include: "rules/cellranger_index.smk"
+include: "rules/cellranger_index.smk"
 #include: "rules/cellranger_vdj_index.smk"
-#include: "rules/kallisto_index.smk"
+include: "rules/kallisto_index.smk"
 include: "rules/star_index.smk"
 #include: "rules/xengsort_index.smk"
 

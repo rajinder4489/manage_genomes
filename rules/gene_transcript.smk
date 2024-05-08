@@ -7,7 +7,7 @@ rule create_gene_transcript_file:
         gt_file = os.path.join(annotation_download_path, "{s}", "{a}_{r}_annotation", "gene-transcript.txt")
 
     log:
-        "logs/gene_transcript/{s}/{a}_{r}_annotation/log.log"
+        "logs/{wildcards.s}_{wildcards.a}_{wildcards.r}_annotation/gene_transcript.log"
     
     shell:
         """
