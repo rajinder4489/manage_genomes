@@ -1,7 +1,7 @@
 # gene-transcript-relation file (kallisto)
 rule create_gene_transcript_file:
     input:
-        gtf_file = os.path.join(annotation_download_path, "{s}", "{a}_{r}_annotation", "gtf.gtf")
+        gtf_file = os.path.join(annotation_download_path, "{s}", "{a}_{r}_annotation", "annotation.gtf")
 
     output:
         gt_file = os.path.join(annotation_download_path, "{s}", "{a}_{r}_annotation", "gene-transcript.txt")

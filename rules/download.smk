@@ -2,8 +2,7 @@ import urllib.request
 
 rule download_annotation_ensembl:
     output:
-        #os.path.join(annotation_download_path, "{s}", "{a}_{r}_annotation", "gtf.gtf") if config["ensembl"]["annotation"]["download"] else "."
-        os.path.join(annotation_download_path, "{s}", "{a}_{r}_annotation", "gtf.gtf")
+        os.path.join(annotation_download_path, "{s}", "{a}_{r}_annotation", "annotation.gtf")
     
     #log:
     #    "logs/{s}_{a}_{r}_downloads_ensembl/annotation.log"
@@ -31,7 +30,7 @@ rule download_annotation_ensembl:
                     """
                     (
                         ls -lha {fasta_download_path}/{species}/{assembly}_{release}_annotation/*.gtf.gz > {fasta_download_path}/{species}/{assembly}_{release}_annotation/readme.txt
-                        zcat {fasta_download_path}/{species}/{assembly}_{release}_annotation/*.gtf.gz > {fasta_download_path}/{species}/{assembly}_{release}_annotation/gtf.gtf
+                        zcat {fasta_download_path}/{species}/{assembly}_{release}_annotation/*.gtf.gz > {fasta_download_path}/{species}/{assembly}_{release}_annotation/annotation.gtf
                         rm -rf {fasta_download_path}/{species}/{assembly}_{release}_annotation/*.gtf.gz
                     )
                     """

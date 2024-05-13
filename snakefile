@@ -163,7 +163,7 @@ for key, values in downloadable_files.items():
 
     
     if(config["ensembl"]["annotation"]["download"]):
-        targets.append(os.path.join(fasta_download_path, species, f"{assembly}_{release}_annotation", "gtf.gtf"))
+        targets.append(os.path.join(fasta_download_path, species, f"{assembly}_{release}_annotation", "annotation.gtf"))
 
 
     if(source == "ensembl" and 
@@ -200,6 +200,18 @@ for key, values in downloadable_files.items():
     
     if(config["annotation_files"]["gene_transcript_relation"]["create"]):
         targets.append(os.path.join(annotation_download_path, f"{species}", f"{assembly}_{release}_annotation", "gene-transcript.txt"))
+
+    
+    if(config["annotation_files"]["bed"]["create"]):
+        targets.append(os.path.join(annotation_download_path, f"{species}", f"{assembly}_{release}_annotation", "annotation.bed"))
+    
+
+    if(config["annotation_files"]["refflat"]["create"]):
+        targets.append(os.path.join(annotation_download_path, f"{species}", f"{assembly}_{release}_annotation", "annotation.refflat"))
+
+    if(config["annotation_files"]["igv"]["create"]):
+        targets.append(os.path.join(annotation_download_path, f"{species}", f"{assembly}_{release}_annotation", "annotation.gtf.igv"))
+
 
 if(source == "ensembl" and 
     config["build_indices"]["xengsort"]["run"]):
@@ -256,7 +268,7 @@ include: "rules/star_index.smk"
 
 
 # GTF derivatives #
-#include: "rules/bed.smk"
+include: "rules/bed.smk"
 include: "rules/gene_transcript.smk"
-#include: "rules/igv.smk"
-#include: "rules/refflat.smk"
+include: "rules/igv.smk"
+include: "rules/refflat.smk"
