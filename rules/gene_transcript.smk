@@ -6,12 +6,11 @@ rule create_gene_transcript_file:
     output:
         gt_file = os.path.join(annotation_download_path, "{s}", "{a}_{r}_annotation", "gene-transcript.txt")
 
-    log:
-        "logs/{wildcards.s}_{wildcards.a}_{wildcards.r}_annotation/gene_transcript.log"
+    #log:
+    #    "logs/{s}_{a}_{wildcar.r}_annotation/gene_transcript.log"
     
     shell:
         """
-        (
             awk -F'\t' '$3=="transcript" {{
                 split($9, fields, ";");
                 for (i in fields) {{
@@ -22,5 +21,4 @@ rule create_gene_transcript_file:
                 }}
                 print gi"\t"ti"\t"gn;
             }}' {input.gtf_file} > {output.gt_file}
-        ) &> {log}
         """

@@ -20,12 +20,10 @@ rule cellranger_index:
         if config["build_indices"]["cellranger"]["run"]:
             shell(
                 """
-                (
                     echo "Making the Cellranger indices"
                     module load apps/cellranger
-                    mkdir -p {cellranger_indices_path}/{wildcards.s}/{wildcards.a}_{wildcards.r}_{wildcards.t}
+                    cd {cellranger_indices_path}/{wildcards.s}/{wildcards.a}_{wildcards.r}_{wildcards.t}
                     cellranger mkref --genome {wildcards.s} --fasta {input.fasta_files} --genes {input.gtf_file} --output-dir {cellranger_indices_path}/{wildcards.s}/{wildcards.a}_{wildcards.r}_{wildcards.t}
                     module unload apps/cellranger
-                )
                 """
                 )

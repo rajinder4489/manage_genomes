@@ -13,6 +13,7 @@ from bs4 import BeautifulSoup
 import re
 import random
 import shutil
+from collections import Counter
 
 
 # config file
@@ -200,7 +201,33 @@ for key, values in downloadable_files.items():
     if(config["annotation_files"]["gene_transcript_relation"]["create"]):
         targets.append(os.path.join(annotation_download_path, f"{species}", f"{assembly}_{release}_annotation", "gene-transcript.txt"))
 
+if(source == "ensembl" and 
+    config["build_indices"]["xengsort"]["run"]):
     
+    if(len(downloadable_files) != 2):
+        error(f"For xengsort index building, two genomes are required. Found {len(downloadable_files)}")
+    else:
+        species_list = []
+        pathname_list = []
+
+        for key in downloadable_files:
+            species_list.append(downloadable_files[key]['species'])
+            
+            #s_parts = downloadable_files[key]['species'].split("_")
+            #pathname_list.append("".join(word[0] for word in s_parts))
+
+            pathname_list.append(downloadable_files[key]['species'])
+            pathname_list.append(downloadable_files[key]['assembly'])
+
+        species_list = [downloadable_files[key]['species'] for key in downloadable_files]
+        species_counts = Counter(species_list)
+        
+        if(len(species_counts) != 2):
+            error(f"For xengsort index building, two species are required. Found {len(species_counts)}")
+        else:
+            pathname = '_'.join(pathname_list)
+            targets.append(os.path.join(xengsort_indices_path, pathname, "xengsort"))
+
 
 targets = list(set(targets))
 print('\n\n'.join(map(str, targets)) + '\n\n')
@@ -230,6 +257,6 @@ include: "rules/star_index.smk"
 
 # GTF derivatives #
 #include: "rules/bed.smk"
-#include: "rules/gene_transcript.smk"
+include: "rules/gene_transcript.smk"
 #include: "rules/igv.smk"
 #include: "rules/refflat.smk"

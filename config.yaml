@@ -6,7 +6,7 @@ seed: 123
 
 local:
         path_genome: "/dcgc/analysis/development/rgupta/github/manage_genomes"
-        # hierarchy of sub folders: 
+        # Target path for the downloads. Hierarchy of sub folders: 
         path_indices: "/dcgc/analysis/development/rgupta/github/manage_genomes"
         # hierarchy of sub folders: cds
         path_other_files: "/dcgc/analysis/development/rgupta/github/manage_genomes"
@@ -21,24 +21,26 @@ ensembl:
         base_url: https://ftp.ensembl.org/pub
         assembly: [grch38]
         release: [release-111]
-        species: [ciona_intestinalis, acanthochromis_polyacanthus] #acanthochromis_polyacanthus, ciona_intestinalis, 
+        species: [ciona_intestinalis, acanthochromis_polyacanthus] #, ciona_intestinalis, 
+        # when running xengsort, give 2 species, others (assembly, release, and seqtype) should have only 1 value. 
+        # (for testing other combinations can be tried as such 2 values for assembly and 1 for all others)
         seq_type: [dna]
         annotation: 
                 download: true
                 local_path: 
-                #  This takes precedence. Define if other than path_genome. Sub folders will be created; refer local
+                #  Target path for the downloads. local_path takes precedence. Define if other than path_genome. Sub folders will be created; refer local
                 file_patterns_include: [gtf]
                 file_patterns_exclude: [abinitio, chromosome, chr.gtf, CHECKSUMS]
         fasta: 
                 download: true
                 local_path: 
-                # This takes precedence. Define if other than path_genome. Sub folders will be created; refer local
+                # Target path for the downloads. local_path takes precedence. Define if other than path_genome. Sub folders will be created; refer local
                 file_patterns_include: [sm]
                 file_patterns_exclude: [rm, primary, nonchromosomal, chromosome]
         repeats: 
                 download: false
-                local_path: 
-                #  This takes precedence. Define if other than path_other_files. Sub folders will be created; refer local
+                local_path:
+                #  Target path for the downloads. local_path takes precedence. Define if other than path_other_files. Sub folders will be created; refer local
 
 
 refseq: 
@@ -53,57 +55,62 @@ other_files:
                 download: false
                 base_url: ftp path
                 local_path: 
-                #  This takes precedence. Define if other than path_other_files. Sub folders will be created; refer local
+                #  Target path for the downloads. local_path takes precedence. Define if other than path_other_files. Sub folders will be created; refer local
 
 
 build_indices:
         bowtie1:
-                run: true
+                run: false
                 local_path: 
-                #  This takes precedence. Define if other than path_indices. Sub folders will be created; refer local
+                #  Target path for the indices. local_path takes precedence. Define if other than path_indices. Sub folders will be created; refer local
                 tool_params: --threads 10
         bowtie2: 
-                run: true
+                run: false
                 local_path: 
-                #  This takes precedence. Define if other than path_indices. Sub folders will be created; refer local
+                #  Target path for the indices. local_path takes precedence. Define if other than path_indices. Sub folders will be created; refer local
                 tool_params: --threads 10 --seed 123
         bwa: 
-                run: true
+                run: false
                 local_path: 
-                #  This takes precedence. Define if other than path_indices. Sub folders will be created; refer local
+                #  Target path for the indices. local_path takes precedence. Define if other than path_indices. Sub folders will be created; refer local
                 tool_params: -a is 
                 # not -p
         cellranger: 
                 run: false
                 local_path: 
-                #  This takes precedence. Define if other than path_indices. Sub folders will be created; refer local
+                #  Target path for the indices. local_path takes precedence. Define if other than path_indices. Sub folders will be created; refer local
                 tool_params: --nthreads 10
                 # not --genome, --fasta, --genes, --output-dir
         kallisto: 
-                run: true
+                run: false
                 local_path: 
-                #  This takes precedence. Define if other than path_indices. Sub folders will be created; refer local
+                #  Target path for the indices. local_path takes precedence. Define if other than path_indices. Sub folders will be created; refer local
                 type: nac
                 # values for type are 'nac' (seq_type: dna) or 'standard' (seq_type: cdna)
                 tool_params: -t 10
                 # not -i
         star: 
-                run: true
+                run: false
                 local_path: 
-                #  This takes precedence. Define if other than path_indices. Sub folders will be created; refer local
+                #  Target path for the indices. local_path takes precedence. Define if other than path_indices. Sub folders will be created; refer local
                 tool_params: --genomeSAindexNbases 12
                 # not --genomeDir, --runMode, --genomeFastaFiles, --sjdbGTFfile
         xengsort: 
-                run: false
+                run: true
                 local_path: 
-                #  This takes precedence. Define if other than path_indices. Sub folders will be created; refer local
-                tool_params:
+                #  Target path for the indices. local_path takes precedence. Define if other than path_indices. Sub folders will be created; refer local
+                tool_params: -n 4_500_000_000
+                # -n is required; check xengsort documentation for details
+                host: acanthochromis_polyacanthus
+                # One of the species as given in [source]["species"]
+                graft: ciona_intestinalis
+                # One of the species as given in [source]["species"]
 
 
 # needs to have the gtf file being downloaded in the current run or already exist at a path (path_to_gtf) to create the following files
 annotation_files:
         path_to_gtf: 
-        # This takes precedence; leave it blank when the gtf is downloaded during the current run
+        # path_to_gtf takes precedence; leave it blank when the gtf is downloaded during the current run
         # if want to use an already existing gtf, put [source][annotation][download] to false
         gene_transcript_relation: 
                 create: true
